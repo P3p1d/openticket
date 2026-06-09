@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ site_name }} - Admin</title>
+    <style>
+        :root {
+            --primary-color: {{ primary_color }};
+            --accent-color: {{ accent_color }};
+            --bg-color: #121212;
+            --text-color: #ffffff;
+        }
+        body {
+            font-family: monospace, Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            margin: 0;
+        }
+        .header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            max-height: 50px;
+        }
+        .nav-links a {
+            color: var(--accent-color);
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        input, select, textarea {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid var(--primary-color);
+            font-family: monospace;
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: #000000;
+            border: none;
+            font-family: monospace;
+            font-weight: bold;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .event-card {
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <img class="logo" src="{{ site_logo }}" alt="Site Logo">
+                <span style="font-size: 24px; font-weight: bold; margin-left: 10px;">{{ site_name }} Admin</span>
+            </div>
+            <div class="nav-links">
+                <a href="/admin/events">Events</a>
+                <a href="/admin/events/new">New Event</a>
+                <a href="/admin/branding">Branding</a>
+            </div>
+        </div>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <h2>Branding Customization</h2>
+    <form action="/admin/branding" method="post" id="branding-form">
+        <label for="site_name">Site Name:</label>
+        <input type="text" id="site_name" name="site_name" value="{{ site_name }}" required>
+        
+        <label for="site_logo">Site Logo URL:</label>
+        <input type="text" id="site_logo" name="site_logo" value="{{ site_logo }}" required>
+        
+        <label for="primary_color">Primary Color:</label>
+        <input type="color" id="primary_color" name="primary_color" value="{{ primary_color }}" required>
+        
+        <label for="accent_color">Accent Color:</label>
+        <input type="color" id="accent_color" name="accent_color" value="{{ accent_color }}" required>
+        
+        <button type="submit">Save Branding</button>
+    </form>
+</div>
+{% endblock %}

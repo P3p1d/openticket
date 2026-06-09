@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <h2>Create New Event</h2>
+    <form action="/admin/events/new" method="post" id="create-event-form">
+        <label for="name">Event Name:</label>
+        <input type="text" id="name" name="name" required placeholder="e.g. Underground Rave">
+        
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4" placeholder="Event description..."></textarea>
+        
+        <label for="date">Date & Time:</label>
+        <input type="datetime-local" id="date" name="date" required>
+        
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required placeholder="e.g. The Warehouse">
+        
+        <button type="submit">Create Event</button>
+    </form>
+</div>
+{% endblock %}

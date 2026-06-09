@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tickets Purchased - {{ site_name }}</title>
+    <style>
+        :root {
+            --primary-color: {{ primary_color }};
+            --accent-color: {{ accent_color }};
+            --bg-color: #0d0d0d;
+            --text-color: #ffffff;
+            --border-color: #333333;
+        }
+        body {
+            font-family: monospace, Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+        .header {
+            border: 2px solid var(--primary-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            background-color: #141414;
+        }
+        .header h1 {
+            color: var(--accent-color);
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }
+        .header p {
+            margin: 5px 0;
+            color: #888888;
+        }
+        .ticket-box {
+            border: 2px dashed var(--primary-color);
+            padding: 20px;
+            margin-bottom: 25px;
+            background-color: #111111;
+            position: relative;
+        }
+        .ticket-box::before, .ticket-box::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .ticket-box::before {
+            left: -12px;
+            border-right: 2px dashed var(--primary-color);
+        }
+        .ticket-box::after {
+            right: -12px;
+            border-left: 2px dashed var(--primary-color);
+        }
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .details {
+            max-width: 65%;
+        }
+        .details h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            color: #ffffff;
+        }
+        .details p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+        .details .code {
+            display: inline-block;
+            background-color: #222222;
+            color: var(--accent-color);
+            padding: 4px 8px;
+            font-weight: bold;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .qr-code {
+            text-align: center;
+        }
+        .qr-code img {
+            border: 4px solid #ffffff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .qr-code span {
+            font-size: 10px;
+            color: #666666;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: #000000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        @media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                padding: 0;
+            }
+            .ticket-box {
+                border: 2px dashed #000000;
+                background-color: #ffffff;
+                page-break-inside: avoid;
+            }
+            .details h3, .details p {
+                color: #000000;
+            }
+            .details .code {
+                background-color: #eeeeee;
+                color: #000000;
+                border: 1px solid #000000;
+            }
+            .actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PAYMENT SUCCESSFUL</h1>
+            <p>Order ID: {{ booking.id }}</p>
+            <p>Quantity: {{ booking.quantity }} x {{ tier.name }}</p>
+        </div>
+
+        <h2>YOUR TICKETS</h2>
+        <p style="color: #888888; font-size: 13px; margin-bottom: 20px;">
+            Present these QR codes at the door. You can print this page or save it on your phone.
+        </p>
+
+        {% for ticket in tickets %}
+        <div class="ticket-box">
+            <div class="ticket-info">
+                <div class="details">
+                    <h3>{{ event.name }}</h3>
+                    <p><strong>Tier:</strong> {{ tier.name }}</p>
+                    <p><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }}</p>
+                    <p><strong>Location:</strong> {{ event.location }}</p>
+                    <span class="code">CODE: {{ ticket.ticket_code[:8]|upper }}...{{ ticket.ticket_code[-4:]|upper }}</span>
+                </div>
+                <div class="qr-code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ ticket.ticket_code }}" alt="QR Check-in">
+                    <span>SCAN AT ENTRY</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="actions">
+            <button class="btn" onclick="window.print()">PRINT TICKETS</button>
+        </div>
+    </div>
+</body>
+</html>

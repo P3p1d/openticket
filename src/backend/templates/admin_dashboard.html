@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-content">
+    <h2>Active Events</h2>
+    {% if events %}
+        {% for event in events %}
+            <div class="event-card">
+                <h3>{{ event.name }}</h3>
+                <p>{{ event.description }}</p>
+                <p><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }}</p>
+                <p><strong>Location:</strong> {{ event.location }}</p>
+                <div style="margin-top: 10px;">
+                    <a href="/admin/events/{{ event.id }}" style="color: var(--accent-color); font-weight: bold; text-decoration: none;">Manage Event & Tiers &rarr;</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No events found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <h2>Event Detail: {{ event.name }}</h2>
+    <div class="event-card" style="border: 2px solid var(--primary-color);">
+        <p><strong>Description:</strong> {{ event.description }}</p>
+        <p><strong>Date & Time:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }}</p>
+        <p><strong>Location:</strong> {{ event.location }}</p>
+    </div>
+
+    <!-- TICKET TIERS SECTION -->
+    <div style="margin-top: 30px;">
+        <h3>Ticket Tiers</h3>
+        {% if event.tiers %}
+            <table style="width: 100%; border-collapse: collapse; font-family: monospace; margin-bottom: 20px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--primary-color); text-align: left;">
+                        <th style="padding: 8px;">Tier Name</th>
+                        <th style="padding: 8px;">Price</th>
+                        <th style="padding: 8px;">Capacity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tier in event.tiers %}
+                        <tr style="border-bottom: 1px solid #333;">
+                            <td style="padding: 8px;">{{ tier.name }}</td>
+                            <td style="padding: 8px;">${{ "%.2f"|format(tier.price) }}</td>
+                            <td style="padding: 8px;">{{ tier.capacity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: #888888;">No ticket tiers added to this event yet.</p>
+        {% endif %}
+
+        <!-- ADD TIER FORM -->
+        <div style="border: 1px dashed var(--primary-color); padding: 15px; background-color: #151515; margin-top: 15px;">
+            <h4>Add New Ticket Tier</h4>
+            <form action="/admin/events/{{ event.id }}/tiers" method="post" id="add-tier-form">
+                <div style="margin-bottom: 10px;">
+                    <label for="tier_name">Tier Name:</label>
+                    <input type="text" id="tier_name" name="name" required placeholder="e.g. Early Bird" style="margin-bottom: 5px;">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="price">Price ($):</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" required placeholder="20.00" style="margin-bottom: 5px;">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="capacity">Capacity (Quantity):</label>
+                    <input type="number" id="capacity" name="capacity" min="1" required placeholder="100" style="margin-bottom: 5px;">
+                </div>
+                <button type="submit" style="margin-top: 10px;">Add Tier</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- TICKET CHECK-IN GATEWAY -->
+    <div style="margin-top: 40px; border: 2px solid var(--accent-color); padding: 20px; background-color: #111;">
+        <h3 style="color: var(--accent-color); margin-top: 0;">DOOR CHECK-IN</h3>
+        <p style="font-size: 13px; color: #888;">Enter or scan the ticket code to check the customer in.</p>
+        
+        <form action="/admin/events/{{ event.id }}/checkin" method="post">
+            <label for="ticket_code">Ticket Code (Full UUID):</label>
+            <input type="text" id="ticket_code" name="ticket_code" required placeholder="e.g. 1a2b3c4d5e..." style="border-color: var(--accent-color);">
+            <button type="submit" style="background-color: var(--accent-color); color: #fff;">VALIDATE & CHECK-IN</button>
+        </form>
+
+        {% if checkin_status %}
+            <div style="margin-top: 20px; padding: 15px; font-weight: bold; border: 1px solid {% if checkin_status == 'success' %}#00ff00; color: #00ff00;{% else %}#ff0000; color: #ff0000;{% endif %}">
+                {{ checkin_message }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

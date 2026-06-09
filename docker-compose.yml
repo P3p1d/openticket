@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  openticket:
+    build: .
+    container_name: openticket_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - openticket_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:////app/data/openticket.db
+      - STRIPE_API_KEY=sk_test_placeholder_key
+      - STRIPE_WEBHOOK_SECRET=whsec_placeholder_secret
+      - TESTING=False
+    restart: unless-stopped
+
+volumes:
+  openticket_data:

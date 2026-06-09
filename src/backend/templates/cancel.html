@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Cancelled - {{ site_name }}</title>
+    <style>
+        :root {
+            --primary-color: {{ primary_color }};
+            --accent-color: {{ accent_color }};
+            --bg-color: #0d0d0d;
+            --text-color: #ffffff;
+        }
+        body {
+            font-family: monospace, Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .box {
+            max-width: 450px;
+            border: 2px solid var(--accent-color);
+            padding: 30px;
+            text-align: center;
+            background-color: #111111;
+        }
+        h2 {
+            color: var(--accent-color);
+            margin: 0 0 15px 0;
+        }
+        p {
+            color: #aaaaaa;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: #000000;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>PAYMENT CANCELLED</h2>
+        <p>The transaction was cancelled and no tickets were booked. If you wish to purchase tickets, please try again from the event page.</p>
+        <a href="javascript:window.close();" class="btn">CLOSE WINDOW</a>
+    </div>
+</body>
+</html>
