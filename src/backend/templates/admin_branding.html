@@ -30,6 +30,9 @@
             <option value="numeric_6" {% if ticket_code_type == 'numeric_6' %}selected{% endif %}>Numeric (6 digits, e.g. 123456)</option>
         </select>
         
+        <label for="delivery_cost">Global Delivery Cost (Physical Tickets):</label>
+        <input type="number" step="0.01" id="delivery_cost" name="delivery_cost" value="{{ delivery_cost }}" required>
+        
         <button type="submit">Save Settings</button>
     </form>
 </div>

@@ -295,18 +295,8 @@
             const bookingSessionId = reserveData.id;
             checkoutBtn.innerText = "Redirecting...";
 
-            // Step 2: Initiate Stripe checkout session
-            const checkoutRes = await fetch(`${apiUrl}/api/bookings/${bookingSessionId}/checkout`, {
-                method: "POST"
-            });
-
-            const checkoutData = await checkoutRes.json();
-            if (!checkoutRes.ok) {
-                throw new Error(checkoutData.detail || "Stripe redirect failed.");
-            }
-
-            // Redirect user to Stripe Checkout
-            window.location.href = checkoutData.checkout_url;
+            // Redirect user to the internal checkout page
+            window.location.href = `/checkout/${bookingSessionId}`;
 
         } catch (err) {
             console.error("Checkout flow failed:", err);

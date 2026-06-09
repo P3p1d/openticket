@@ -1,0 +1,52 @@
+{% extends "public_base.html" %}
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto; background-color: #1a1a1a; padding: 20px; border: 1px solid var(--primary-color);">
+    <h2 style="color: var(--accent-color); margin-top: 0;">{{ _('Complete Your Reservation') }}</h2>
+    
+    <div style="margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333;">
+        <p><strong>{{ _('Event:') }}</strong> {{ event.name }}</p>
+        <p><strong>{{ _('Ticket Tier:') }}</strong> {{ tier.name }}</p>
+        <p><strong>{{ _('Quantity:') }}</strong> {{ booking.quantity }}</p>
+        <p><strong>{{ _('Subtotal:') }}</strong> {{ currency }} {{ (tier.price * booking.quantity)|round(2) }}</p>
+    </div>
+
+    <form action="/checkout/{{ booking.id }}" method="post">
+        <label for="customer_name">{{ _('Full Name:') }}</label>
+        <input type="text" id="customer_name" name="customer_name" required>
+        
+        <label for="customer_email">{{ _('Email Address:') }}</label>
+        <input type="email" id="customer_email" name="customer_email" required>
+        
+        {% if event.offers_physical_tickets %}
+        <label for="delivery_method">{{ _('Delivery Method:') }}</label>
+        <select id="delivery_method" name="delivery_method" required onchange="toggleAddress(this)">
+            <option value="digital">{{ _('Digital Ticket (Email)') }}</option>
+            <option value="physical">{{ _('Physical Ticket (Mail)') }} (+{{ currency }} {{ delivery_cost }})</option>
+        </select>
+        
+        <div id="address_group" style="display: none;">
+            <label for="customer_address">{{ _('Shipping Address:') }}</label>
+            <textarea id="customer_address" name="customer_address" rows="3"></textarea>
+        </div>
+        
+        <script>
+            function toggleAddress(select) {
+                var group = document.getElementById("address_group");
+                var input = document.getElementById("customer_address");
+                if (select.value === "physical") {
+                    group.style.display = "block";
+                    input.required = true;
+                } else {
+                    group.style.display = "none";
+                    input.required = false;
+                }
+            }
+        </script>
+        {% else %}
+        <input type="hidden" name="delivery_method" value="digital">
+        {% endif %}
+        
+        <button type="submit" style="width: 100%; margin-top: 20px;">{{ _('Proceed to Payment') }}</button>
+    </form>
+</div>
+{% endblock %}

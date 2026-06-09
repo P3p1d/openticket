@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ site_name }} - Admin</title>
+    <title>{{ site_name }}</title>
     <style>
         :root {
             --primary-color: {{ primary_color }};
@@ -41,28 +41,6 @@
             max-width: 800px;
             margin: 0 auto;
         }
-        input, select, textarea {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            border: 1px solid var(--primary-color);
-            font-family: monospace;
-            padding: 8px;
-            width: 100%;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: var(--primary-color);
-            color: #000000;
-            border: none;
-            font-family: monospace;
-            font-weight: bold;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
         .event-card {
             border: 1px solid #333;
             padding: 15px;
@@ -76,14 +54,11 @@
         <div class="header">
             <div>
                 <img class="logo" src="{{ site_logo }}" alt="Site Logo">
-                <span style="font-size: 24px; font-weight: bold; margin-left: 10px;">{{ site_name }} Admin</span>
+                <span style="font-size: 24px; font-weight: bold; margin-left: 10px;">{{ site_name }}</span>
             </div>
             <div class="nav-links">
-                <a href="/" style="color: #888888; font-size: 12px; margin-right: 20px;">[Public Site]</a>
-                <a href="/admin/events">Events</a>
-                <a href="/admin/events/new">New Event</a>
-                <a href="/admin/branding">Branding</a>
-                <a href="/admin/logout">Logout</a>
+                <a href="/">Home</a>
+                <a href="/admin/events" style="font-size: 12px; color: #888888;">[Admin Portal]</a>
             </div>
         </div>
         {% block content %}{% endblock %}

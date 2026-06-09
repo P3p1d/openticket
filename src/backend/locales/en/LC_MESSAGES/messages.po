@@ -1,0 +1,88 @@
+# English translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-06-09 18:40+0200\n"
+"PO-Revision-Date: 2026-06-09 18:36+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: src/backend/templates/checkout.html:4
+msgid "Complete Your Reservation"
+msgstr ""
+
+#: src/backend/templates/checkout.html:7
+msgid "Event:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:8
+msgid "Ticket Tier:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:9
+msgid "Quantity:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:10
+msgid "Subtotal:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:14
+msgid "Full Name:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:17
+msgid "Email Address:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:21
+msgid "Delivery Method:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:23
+msgid "Digital Ticket (Email)"
+msgstr ""
+
+#: src/backend/templates/checkout.html:24
+msgid "Physical Ticket (Mail)"
+msgstr ""
+
+#: src/backend/templates/checkout.html:28
+msgid "Shipping Address:"
+msgstr ""
+
+#: src/backend/templates/checkout.html:49
+msgid "Proceed to Payment"
+msgstr ""
+
+#: src/backend/templates/index.html:4
+msgid "Upcoming Events"
+msgstr ""
+
+#: src/backend/templates/index.html:11
+msgid "DATE:"
+msgstr ""
+
+#: src/backend/templates/index.html:12
+msgid "LOCATION:"
+msgstr ""
+
+#: src/backend/templates/index.html:15
+msgid "Get Tickets"
+msgstr ""
+
+#: src/backend/templates/index.html:20
+msgid "No upcoming events found."
+msgstr ""
+

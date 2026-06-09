@@ -14,6 +14,9 @@ class Event(Base):
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     location: Mapped[str] = mapped_column(String, nullable=False)
+    visible_from: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_hidden: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    offers_physical_tickets: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     
     # relationships
     tiers: Mapped[List["TicketTier"]] = relationship(
@@ -57,6 +60,11 @@ class BookingSession(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False) # UTC datetime
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False) # created_at + reservation window
     stripe_session_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    
+    customer_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    delivery_method: Mapped[Optional[str]] = mapped_column(String, nullable=True) # "digital" or "physical"
     
     # relationships
     tier: Mapped["TicketTier"] = relationship("TicketTier", back_populates="booking_sessions")

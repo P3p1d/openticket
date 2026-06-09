@@ -1,0 +1,35 @@
+{% extends "public_base.html" %}
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto; background-color: #1a1a1a; padding: 30px; border: 2px solid #ff0055; text-align: center;">
+    <h2 style="color: #ff0055; margin-top: 0; text-transform: uppercase;">MOCK PAYGATE</h2>
+    <p style="color: #888;">This is a test payment gateway.</p>
+    
+    <div style="margin: 20px 0; font-size: 24px; font-weight: bold; color: #fff;">
+        Total: {{ currency }} {{ total_amount|round(2) }}
+    </div>
+    
+    <form action="/api/mock-paygate/{{ booking.id }}" method="post">
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label style="color: #888; font-size: 12px;">Card Number</label>
+            <input type="text" value="4242 4242 4242 4242" style="font-family: monospace; letter-spacing: 2px; text-align: center; color: #fff;" readonly>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+            <div style="flex: 1; text-align: left;">
+                <label style="color: #888; font-size: 12px;">Expiry</label>
+                <input type="text" value="12/30" style="text-align: center;" readonly>
+            </div>
+            <div style="flex: 1; text-align: left;">
+                <label style="color: #888; font-size: 12px;">CVC</label>
+                <input type="text" value="123" style="text-align: center;" readonly>
+            </div>
+        </div>
+        
+        <button type="submit" style="width: 100%; background-color: #ff0055; color: #fff; padding: 15px; font-size: 16px;">SIMULATE PAYMENT</button>
+    </form>
+    
+    <div style="margin-top: 15px;">
+        <a href="/cancel" style="color: #888; text-decoration: none; font-size: 12px;">Cancel Return to Merchant</a>
+    </div>
+</div>
+{% endblock %}

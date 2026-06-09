@@ -1,0 +1,23 @@
+{% extends "public_base.html" %}
+{% block content %}
+<div>
+    <h2>{{ _('Upcoming Events') }}</h2>
+    {% if events %}
+        {% for event in events %}
+            <div class="event-card" style="border-left: 4px solid var(--primary-color); margin-bottom: 20px;">
+                <h3 style="margin-top: 0; text-transform: uppercase;">
+                    <a href="/events/{{ event.id }}" style="color: var(--accent-color); text-decoration: none;">{{ event.name }}</a>
+                </h3>
+                <p style="margin: 5px 0; font-size: 13px; color: #aaaaaa;">{{ _('DATE:') }} {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }} (UTC)</p>
+                <p style="margin: 5px 0; font-size: 13px; color: #aaaaaa;">{{ _('LOCATION:') }} {{ event.location }}</p>
+                <p style="margin-top: 10px; margin-bottom: 0;">{{ event.description or '' }}</p>
+                <div style="margin-top: 15px; text-align: right;">
+                    <a href="/events/{{ event.id }}" style="background-color: var(--primary-color); color: #000000; padding: 5px 15px; font-weight: bold; text-decoration: none; text-transform: uppercase; font-size: 12px;">{{ _('Get Tickets') }}</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #888888; font-style: italic;">{{ _('No upcoming events found.') }}</p>
+    {% endif %}
+</div>
+{% endblock %}

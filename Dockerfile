@@ -21,6 +21,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 # Copy project files
 COPY src /app/src/
+COPY alembic /app/alembic/
+COPY alembic.ini /app/
 
 # Create directory for persistent SQLite data
 RUN mkdir -p /app/data
@@ -29,4 +31,4 @@ RUN mkdir -p /app/data
 EXPOSE 8000
 
 # Start application
-CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn src.backend.main:app --host 0.0.0.0 --port 8000"]

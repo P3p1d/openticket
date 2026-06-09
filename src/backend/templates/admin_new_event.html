@@ -15,6 +15,14 @@
         <label for="location">Location:</label>
         <input type="text" id="location" name="location" required placeholder="e.g. The Warehouse">
         
+        <label for="visible_from">Visible From (Optional):</label>
+        <input type="datetime-local" id="visible_from" name="visible_from">
+        
+        <label style="display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 20px;">
+            <input type="checkbox" id="offers_physical_tickets" name="offers_physical_tickets" value="true" style="width: auto; margin: 0;">
+            Offers Physical Tickets Delivery
+        </label>
+        
         <button type="submit">Create Event</button>
     </form>
 </div>

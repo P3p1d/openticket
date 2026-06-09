@@ -12,9 +12,17 @@ from src.backend.models import Event, SystemSetting, TicketTier, Ticket
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+from src.backend.i18n import get_translator
+
 templates_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
 templates = Jinja2Templates(directory=templates_path)
 templates.env.globals["hasattr"] = hasattr
+
+original_template_response = templates.TemplateResponse
+def custom_template_response(request: Request, name: str, context: dict, *args, **kwargs):
+    context["_"] = get_translator(request)
+    return original_template_response(request=request, name=name, context=context, *args, **kwargs)
+templates.TemplateResponse = custom_template_response
 
 # ----------------- AUTHENTICATION DEPENDENCY -----------------
 def get_admin_user(request: Request, session_token: Optional[str] = Cookie(None)):
@@ -37,6 +45,7 @@ def get_branding(db: Session):
     accent_color = db.execute(select(SystemSetting).where(SystemSetting.key == "accent_color")).scalar_one_or_none()
     currency = db.execute(select(SystemSetting).where(SystemSetting.key == "currency")).scalar_one_or_none()
     ticket_code_type = db.execute(select(SystemSetting).where(SystemSetting.key == "ticket_code_type")).scalar_one_or_none()
+    delivery_cost = db.execute(select(SystemSetting).where(SystemSetting.key == "delivery_cost")).scalar_one_or_none()
     
     return {
         "site_name": site_name.value if site_name else "OpenTicket",
@@ -45,6 +54,7 @@ def get_branding(db: Session):
         "accent_color": accent_color.value if accent_color else "#ff0055",
         "currency": currency.value if currency else "USD",
         "ticket_code_type": ticket_code_type.value if ticket_code_type else "uuid",
+        "delivery_cost": float(delivery_cost.value) if delivery_cost else 0.0,
     }
 
 # ----------------- AUTH ROUTING -----------------
@@ -145,6 +155,7 @@ def admin_branding_post(
     accent_color: str = Form(...),
     currency: str = Form("USD"),
     ticket_code_type: str = Form("uuid"),
+    delivery_cost: float = Form(0.0),
     db: Session = Depends(get_db),
     admin: str = Depends(get_admin_user)
 ):
@@ -154,7 +165,8 @@ def admin_branding_post(
         ("primary_color", primary_color),
         ("accent_color", accent_color),
         ("currency", currency.upper()),
-        ("ticket_code_type", ticket_code_type)
+        ("ticket_code_type", ticket_code_type),
+        ("delivery_cost", str(delivery_cost))
     ]:
         setting = db.execute(select(SystemSetting).where(SystemSetting.key == key)).scalar_one_or_none()
         if not setting:
@@ -226,6 +238,8 @@ def admin_create_event(
     description: str = Form(""),
     date: str = Form(...),
     location: str = Form(...),
+    visible_from: Optional[str] = Form(None),
+    offers_physical_tickets: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     admin: str = Depends(get_admin_user)
 ):
@@ -234,11 +248,20 @@ def admin_create_event(
     except Exception:
         event_date = datetime.now()
         
+    visible_dt = None
+    if visible_from:
+        try:
+            visible_dt = datetime.fromisoformat(visible_from)
+        except Exception:
+            pass
+            
     db_event = Event(
         name=name,
         description=description,
         date=event_date,
-        location=location
+        location=location,
+        visible_from=visible_dt,
+        offers_physical_tickets=(offers_physical_tickets == "true")
     )
     db.add(db_event)
     db.commit()

@@ -1,0 +1,14 @@
+{% extends "public_base.html" %}
+{% block content %}
+<div>
+    <div style="margin-bottom: 20px;">
+        <a href="/" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">&larr; Back to Events</a>
+    </div>
+
+    <!-- Embeddable widget container -->
+    <div id="openticket-widget" data-event-id="{{ event_id }}" data-api-url=""></div>
+
+    <!-- Load the widget script -->
+    <script src="/static/widget.js"></script>
+</div>
+{% endblock %}
