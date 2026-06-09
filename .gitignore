@@ -222,5 +222,5 @@ __marimo__/
 *.sqlite
 *.sqlite3
 
-
-TODO.txt
+# Private lists
+TODO.txt

@@ -120,30 +120,93 @@
                         color: #888888;
                         padding: 20px;
                     }
+                    .ot-tier-status {
+                        font-size: 12px;
+                        color: #888888;
+                        border: 1px solid #333333;
+                        padding: 3px 6px;
+                        background-color: #0d0d0d;
+                    }
                 `;
                 document.head.appendChild(styleEl);
             }
 
             // 3. Render Widget HTML structure
             let tiersHtml = "";
+            let hasAnyAvailable = false;
+            const currency = config.currency || "USD";
+            const currencySymbols = {
+                "USD": "$",
+                "EUR": "€",
+                "GBP": "£",
+                "CZK": " Kč"
+            };
+            const symbol = currencySymbols[currency] || "$";
+
             if (event.tiers && event.tiers.length > 0) {
                 event.tiers.forEach(tier => {
-                    // Check if sold out (capacity vs sold is checked backend, but let's draw standard list)
+                    const now = new Date();
+                    let isPaused = !tier.is_active;
+                    
+                    let hasNotStarted = false;
+                    if (tier.sales_start_at) {
+                        const startAt = new Date(tier.sales_start_at);
+                        if (now < startAt) {
+                            hasNotStarted = true;
+                        }
+                    }
+                    
+                    let hasEnded = false;
+                    if (tier.sales_end_at) {
+                        const endAt = new Date(tier.sales_end_at);
+                        if (now > endAt) {
+                            hasEnded = true;
+                        }
+                    }
+
+                    let priceStr = "";
+                    if (currency === "CZK") {
+                        priceStr = `${tier.price.toFixed(2)} Kč`;
+                    } else {
+                        priceStr = `${symbol}${tier.price.toFixed(2)}`;
+                    }
+
+                    let controlHtml = "";
+                    if (!isPaused && !hasNotStarted && !hasEnded) {
+                        hasAnyAvailable = true;
+                        controlHtml = `
+                            <select class="ot-qty-selector" data-tier-id="${tier.id}">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        `;
+                    } else {
+                        let statusText = "";
+                        if (isPaused) {
+                            statusText = "Sales paused";
+                        } else if (hasNotStarted) {
+                            const startStr = new Date(tier.sales_start_at).toLocaleString(undefined, {
+                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            });
+                            statusText = `Sales start: ${startStr}`;
+                        } else if (hasEnded) {
+                            statusText = "Sales ended";
+                        }
+                        controlHtml = `<span class="ot-tier-status">${statusText}</span>`;
+                    }
+
                     tiersHtml += `
                         <div class="ot-tier-row">
                             <div class="ot-tier-info">
                                 <h4>${tier.name}</h4>
-                                <span>$${tier.price.toFixed(2)}</span>
+                                <span>${priceStr}</span>
                             </div>
                             <div>
-                                <select class="ot-qty-selector" data-tier-id="${tier.id}">
-                                    <option value="0">0</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
+                                ${controlHtml}
                             </div>
                         </div>
                     `;
@@ -168,7 +231,7 @@
                         ${tiersHtml}
                     </div>
                     <div id="ot-error-msg" class="ot-error"></div>
-                    ${event.tiers && event.tiers.length > 0 ? `<button id="ot-checkout-btn" class="ot-button">CHECKOUT TICKETS</button>` : ''}
+                    ${hasAnyAvailable ? `<button id="ot-checkout-btn" class="ot-button">CHECKOUT TICKETS</button>` : ''}
                 </div>
             `;
 

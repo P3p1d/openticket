@@ -7,7 +7,8 @@ from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
 
 from src.backend.database import get_db
-from src.backend.models import BookingSession, Ticket, TicketTier
+from src.backend.models import BookingSession, Ticket, TicketTier, SystemSetting
+from src.backend.routes.events import generate_unique_ticket_code
 
 router = APIRouter(prefix="/api/bookings", tags=["bookings"])
 webhook_router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
@@ -56,6 +57,9 @@ def create_checkout_session(booking_session_id: str, request: Request, db: Sessi
         raise HTTPException(status_code=404, detail="Ticket tier not found")
         
     try:
+        currency_setting = db.execute(select(SystemSetting).where(SystemSetting.key == "currency")).scalar_one_or_none()
+        currency = currency_setting.value.lower() if currency_setting else "usd"
+
         base_url = str(request.base_url).rstrip("/")
         success_url = f"{base_url}/success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{base_url}/cancel"
@@ -64,7 +68,7 @@ def create_checkout_session(booking_session_id: str, request: Request, db: Sessi
             payment_method_types=['card'],
             line_items=[{
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': currency,
                     'product_data': {
                         'name': f"Tickets for {tier.name}",
                     },
@@ -142,7 +146,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                         ticket = Ticket(
                             booking_session_id=booking.id,
                             tier_id=booking.tier_id,
-                            ticket_code=uuid.uuid4().hex,
+                            ticket_code=generate_unique_ticket_code(db),
                             status="valid"
                         )
                         db.add(ticket)

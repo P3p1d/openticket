@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from sqlalchemy import ForeignKey, String, DateTime, Float, Integer
+from sqlalchemy import ForeignKey, String, DateTime, Float, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
@@ -30,6 +30,9 @@ class TicketTier(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     price: Mapped[float] = mapped_column(Float, nullable=False)
     capacity: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    sales_start_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    sales_end_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     
     # relationships
     event: Mapped["Event"] = relationship("Event", back_populates="tiers")

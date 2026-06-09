@@ -15,7 +15,22 @@
         <label for="accent_color">Accent Color:</label>
         <input type="color" id="accent_color" name="accent_color" value="{{ accent_color }}" required>
         
-        <button type="submit">Save Branding</button>
+        <label for="currency">Ticket Currency:</label>
+        <select id="currency" name="currency" required style="background-color: #1a1a1a; color: #ffffff; border: 1px solid var(--primary-color); font-family: monospace; padding: 8px; width: 100%; margin-bottom: 15px; box-sizing: border-box;">
+            <option value="USD" {% if currency == 'USD' %}selected{% endif %}>USD ($)</option>
+            <option value="EUR" {% if currency == 'EUR' %}selected{% endif %}>EUR (€)</option>
+            <option value="GBP" {% if currency == 'GBP' %}selected{% endif %}>GBP (£)</option>
+            <option value="CZK" {% if currency == 'CZK' %}selected{% endif %}>CZK (Kč)</option>
+        </select>
+        
+        <label for="ticket_code_type">Ticket Code Format:</label>
+        <select id="ticket_code_type" name="ticket_code_type" required style="background-color: #1a1a1a; color: #ffffff; border: 1px solid var(--primary-color); font-family: monospace; padding: 8px; width: 100%; margin-bottom: 15px; box-sizing: border-box;">
+            <option value="uuid" {% if ticket_code_type == 'uuid' %}selected{% endif %}>UUID Long Hex (32 chars)</option>
+            <option value="alphanumeric_8" {% if ticket_code_type == 'alphanumeric_8' %}selected{% endif %}>Alphanumeric (8 chars, e.g. AB12CD34)</option>
+            <option value="numeric_6" {% if ticket_code_type == 'numeric_6' %}selected{% endif %}>Numeric (6 digits, e.g. 123456)</option>
+        </select>
+        
+        <button type="submit">Save Settings</button>
     </form>
 </div>
 {% endblock %}

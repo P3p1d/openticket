@@ -1,4 +1,6 @@
 import uuid
+import random
+import string
 from datetime import datetime, timedelta, timezone
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -6,7 +8,31 @@ from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session
 
 from src.backend.database import get_db
-from src.backend.models import Event, TicketTier, BookingSession, Ticket
+from src.backend.models import Event, TicketTier, BookingSession, Ticket, SystemSetting
+
+def generate_unique_ticket_code(db: Session) -> str:
+    setting = db.execute(
+        select(SystemSetting).where(SystemSetting.key == "ticket_code_type")
+    ).scalar_one_or_none()
+    code_type = setting.value if setting else "uuid"
+    
+    attempts = 0
+    while attempts < 100:
+        if code_type == "alphanumeric_8":
+            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        elif code_type == "numeric_6":
+            code = "".join(random.choices(string.digits, k=6))
+        else:
+            code = uuid.uuid4().hex
+            
+        stmt = select(Ticket).where(Ticket.ticket_code == code)
+        exists = db.execute(stmt).scalar()
+        if not exists:
+            return code
+        attempts += 1
+        
+    return uuid.uuid4().hex
+
 from src.backend.schemas import (
     EventCreate,
     EventResponse,
@@ -98,8 +124,26 @@ def reserve_tickets(event_id: int, request: BookingReservationRequest, db: Sessi
                 detail="Ticket tier does not belong to this event"
             )
             
-        # 2. Query BookingSession to sum up active quantities for the tier_id
+        if not tier.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sales for this ticket tier are paused"
+            )
+            
         now = datetime.now(timezone.utc).replace(tzinfo=None)
+        if tier.sales_start_at and now < tier.sales_start_at:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sales for this ticket tier have not started yet"
+            )
+            
+        if tier.sales_end_at and now > tier.sales_end_at:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Sales for this ticket tier have ended"
+            )
+            
+        # 2. Query BookingSession to sum up active quantities for the tier_id
         active_reservations_stmt = select(func.sum(BookingSession.quantity)).where(
             BookingSession.tier_id == request.tier_id,
             or_(
@@ -138,7 +182,7 @@ def reserve_tickets(event_id: int, request: BookingReservationRequest, db: Sessi
             ticket = Ticket(
                 booking_session_id=booking_id,
                 tier_id=request.tier_id,
-                ticket_code=uuid.uuid4().hex,
+                ticket_code=generate_unique_ticket_code(db),
                 status="reserved"
             )
             db.add(ticket)

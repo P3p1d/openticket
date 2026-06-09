@@ -4,7 +4,9 @@ from src.backend.main import app
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    c = TestClient(app)
+    c.cookies.set("session_token", "admin_session")
+    return c
 
 def test_admin_branding_get_post(client):
     # Test GET branding page

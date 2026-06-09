@@ -4,7 +4,9 @@ from src.backend.main import app
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    c = TestClient(app)
+    c.cookies.set("session_token", "admin_session")
+    return c
 
 def test_create_event_api_success(client):
     payload = {

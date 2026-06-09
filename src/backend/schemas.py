@@ -35,6 +35,9 @@ class TicketTierCreate(BaseModel):
     name: str = Field(..., min_length=1)
     price: float = Field(..., ge=0.0)
     capacity: int = Field(..., gt=0)
+    is_active: Optional[bool] = True
+    sales_start_at: Optional[datetime] = None
+    sales_end_at: Optional[datetime] = None
 
 class TicketTierResponse(BaseModel):
     id: int
@@ -42,6 +45,9 @@ class TicketTierResponse(BaseModel):
     name: str
     price: float
     capacity: int
+    is_active: bool
+    sales_start_at: Optional[datetime]
+    sales_end_at: Optional[datetime]
 
     model_config = ConfigDict(from_attributes=True)
 

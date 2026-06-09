@@ -1,11 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 <div>
-    <h2>Event Detail: {{ event.name }}</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Event Detail: {{ event.name }}</h2>
+        <a href="/admin/events" style="color: var(--primary-color); font-family: monospace; font-weight: bold; text-decoration: none;">&larr; Back to Events</a>
+    </div>
+    
     <div class="event-card" style="border: 2px solid var(--primary-color);">
-        <p><strong>Description:</strong> {{ event.description }}</p>
-        <p><strong>Date & Time:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }}</p>
+        <p><strong>Description:</strong> {{ event.description or 'No description provided.' }}</p>
+        <p><strong>Date & Time:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }} (UTC)</p>
         <p><strong>Location:</strong> {{ event.location }}</p>
+    </div>
+
+    <!-- EVENT STATISTICS -->
+    <div style="margin-top: 25px; border: 1px solid #333; padding: 20px; background-color: #1a1a1a;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; border-bottom: 1px dashed #444; padding-bottom: 8px;">Event Statistics</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; font-family: monospace;">
+            <div style="flex: 1; min-width: 160px; border-right: 1px dashed #444; padding-right: 15px;">
+                <div style="font-size: 11px; color: #888; margin-bottom: 5px;">TICKETS RESERVED/SOLD</div>
+                <div style="font-size: 22px; font-weight: bold; color: var(--primary-color);">{{ total_sold }} / {{ total_capacity }}</div>
+                <div style="margin-top: 8px;">
+                    <div style="border: 1px solid #444; height: 10px; background-color: #000; position: relative;">
+                        <div style="background-color: var(--primary-color); width: {{ sold_pct }}%; height: 100%;"></div>
+                    </div>
+                    <span style="font-size: 10px; color: #888;">{{ sold_pct }}% Allocated</span>
+                </div>
+            </div>
+            
+            <div style="flex: 1; min-width: 160px; border-right: 1px dashed #444; padding-right: 15px;">
+                <div style="font-size: 11px; color: #888; margin-bottom: 5px;">TOTAL REVENUE</div>
+                <div style="font-size: 22px; font-weight: bold; color: var(--accent-color);">{{ currency }} {{ "%.2f"|format(total_revenue) }}</div>
+                <span style="font-size: 10px; color: #888;">From completed payments</span>
+            </div>
+            
+            <div style="flex: 1; min-width: 160px;">
+                <div style="font-size: 11px; color: #888; margin-bottom: 5px;">DOOR ATTENDANCE</div>
+                <div style="font-size: 22px; font-weight: bold; color: #00ff00;">{{ total_checked_in }} / {{ total_paid_tickets }}</div>
+                <div style="margin-top: 8px;">
+                    <div style="border: 1px solid #444; height: 10px; background-color: #000; position: relative;">
+                        <div style="background-color: #00ff00; width: {{ checkin_pct }}%; height: 100%;"></div>
+                    </div>
+                    <span style="font-size: 10px; color: #888;">{{ checkin_pct }}% Checked-in</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- TICKET TIERS SECTION -->
@@ -18,14 +56,35 @@
                         <th style="padding: 8px;">Tier Name</th>
                         <th style="padding: 8px;">Price</th>
                         <th style="padding: 8px;">Capacity</th>
+                        <th style="padding: 8px;">Sales Status</th>
+                        <th style="padding: 8px;">Sales Date Window (UTC)</th>
+                        <th style="padding: 8px; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for tier in event.tiers %}
                         <tr style="border-bottom: 1px solid #333;">
-                            <td style="padding: 8px;">{{ tier.name }}</td>
-                            <td style="padding: 8px;">${{ "%.2f"|format(tier.price) }}</td>
+                            <td style="padding: 8px; font-weight: bold;">{{ tier.name }}</td>
+                            <td style="padding: 8px;">{{ currency }} {{ "%.2f"|format(tier.price) }}</td>
                             <td style="padding: 8px;">{{ tier.capacity }}</td>
+                            <td style="padding: 8px;">
+                                {% if not tier.is_active %}
+                                    <span style="background-color: #331f00; color: #ffaa00; padding: 2px 6px; font-size: 11px; border: 1px solid #ffaa00;">PAUSED</span>
+                                {% else %}
+                                    <span style="background-color: #0f2c0f; color: #00ff00; padding: 2px 6px; font-size: 11px; border: 1px solid #00ff00;">ACTIVE</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 8px; font-size: 12px; color: #aaa;">
+                                {% if tier.sales_start_at or tier.sales_end_at %}
+                                    {{ tier.sales_start_at.strftime('%m-%d %H:%M') if (tier.sales_start_at and hasattr(tier.sales_start_at, 'strftime')) else 'Immediate' }} &rarr;
+                                    {{ tier.sales_end_at.strftime('%m-%d %H:%M') if (tier.sales_end_at and hasattr(tier.sales_end_at, 'strftime')) else 'Open' }}
+                                {% else %}
+                                    No restriction
+                                {% endif %}
+                            </td>
+                            <td style="padding: 8px; text-align: right;">
+                                <a href="/admin/events/{{ event.id }}/tiers/{{ tier.id }}/edit" style="color: var(--accent-color); font-weight: bold; text-decoration: none;">[Edit/Delete]</a>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -38,18 +97,31 @@
         <div style="border: 1px dashed var(--primary-color); padding: 15px; background-color: #151515; margin-top: 15px;">
             <h4>Add New Ticket Tier</h4>
             <form action="/admin/events/{{ event.id }}/tiers" method="post" id="add-tier-form">
-                <div style="margin-bottom: 10px;">
+                <div style="margin-bottom: 12px;">
                     <label for="tier_name">Tier Name:</label>
                     <input type="text" id="tier_name" name="name" required placeholder="e.g. Early Bird" style="margin-bottom: 5px;">
                 </div>
-                <div style="margin-bottom: 10px;">
-                    <label for="price">Price ($):</label>
+                <div style="margin-bottom: 12px;">
+                    <label for="price">Price ({{ currency }}):</label>
                     <input type="number" id="price" name="price" step="0.01" min="0" required placeholder="20.00" style="margin-bottom: 5px;">
                 </div>
-                <div style="margin-bottom: 10px;">
+                <div style="margin-bottom: 12px;">
                     <label for="capacity">Capacity (Quantity):</label>
                     <input type="number" id="capacity" name="capacity" min="1" required placeholder="100" style="margin-bottom: 5px;">
                 </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <label for="sales_start_at">Sales Start Date & Time (UTC):</label>
+                    <input type="datetime-local" id="sales_start_at" name="sales_start_at" style="margin-bottom: 5px;">
+                    <span style="font-size: 11px; color: #888;">Leave blank to open sales immediately.</span>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <label for="sales_end_at">Sales End Date & Time (UTC):</label>
+                    <input type="datetime-local" id="sales_end_at" name="sales_end_at" style="margin-bottom: 5px;">
+                    <span style="font-size: 11px; color: #888;">Leave blank to keep sales open until event date or sold out.</span>
+                </div>
+                
                 <button type="submit" style="margin-top: 10px;">Add Tier</button>
             </form>
         </div>
@@ -61,13 +133,13 @@
         <p style="font-size: 13px; color: #888;">Enter or scan the ticket code to check the customer in.</p>
         
         <form action="/admin/events/{{ event.id }}/checkin" method="post">
-            <label for="ticket_code">Ticket Code (Full UUID):</label>
-            <input type="text" id="ticket_code" name="ticket_code" required placeholder="e.g. 1a2b3c4d5e..." style="border-color: var(--accent-color);">
+            <label for="ticket_code">Ticket Code (Full Code):</label>
+            <input type="text" id="ticket_code" name="ticket_code" required placeholder="e.g. AB12CD34" style="border-color: var(--accent-color); text-transform: uppercase;">
             <button type="submit" style="background-color: var(--accent-color); color: #fff;">VALIDATE & CHECK-IN</button>
         </form>
 
         {% if checkin_status %}
-            <div style="margin-top: 20px; padding: 15px; font-weight: bold; border: 1px solid {% if checkin_status == 'success' %}#00ff00; color: #00ff00;{% else %}#ff0000; color: #ff0000;{% endif %}">
+            <div style="margin-top: 20px; padding: 15px; font-weight: bold; border: 2px solid {% if checkin_status == 'success' %}#00ff00; color: #00ff00; background-color: #082008;{% else %}#ff0000; color: #ff0000; background-color: #200808;{% endif %}">
                 {{ checkin_message }}
             </div>
         {% endif %}
