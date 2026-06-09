@@ -24,21 +24,31 @@
             <option value="physical">{{ _('Physical Ticket (Mail)') }} (+{{ currency }} {{ delivery_cost }})</option>
         </select>
         
-        <div id="address_group" style="display: none;">
-            <label for="customer_address">{{ _('Shipping Address:') }}</label>
-            <textarea id="customer_address" name="customer_address" rows="3"></textarea>
+        <div id="address_group" style="display: none; border: 1px solid #333; padding: 15px; margin-bottom: 15px;">
+            <h4 style="margin-top: 0;">{{ _('Shipping Address:') }}</h4>
+            <label for="customer_street">{{ _('Street:') }}</label>
+            <input type="text" id="customer_street" name="customer_street" class="address-input">
+            
+            <label for="customer_street_number">{{ _('Street Number:') }}</label>
+            <input type="text" id="customer_street_number" name="customer_street_number" class="address-input">
+            
+            <label for="customer_city">{{ _('City:') }}</label>
+            <input type="text" id="customer_city" name="customer_city" class="address-input">
+            
+            <label for="customer_zip">{{ _('ZIP Code:') }}</label>
+            <input type="text" id="customer_zip" name="customer_zip" class="address-input">
         </div>
         
         <script>
             function toggleAddress(select) {
                 var group = document.getElementById("address_group");
-                var input = document.getElementById("customer_address");
+                var inputs = document.querySelectorAll(".address-input");
                 if (select.value === "physical") {
                     group.style.display = "block";
-                    input.required = true;
+                    inputs.forEach(i => i.required = true);
                 } else {
                     group.style.display = "none";
-                    input.required = false;
+                    inputs.forEach(i => i.required = false);
                 }
             }
         </script>

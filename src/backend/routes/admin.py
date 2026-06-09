@@ -53,7 +53,7 @@ def get_branding(db: Session):
         "primary_color": primary_color.value if primary_color else "#ffffff",
         "accent_color": accent_color.value if accent_color else "#ff0055",
         "currency": currency.value if currency else "USD",
-        "ticket_code_type": ticket_code_type.value if ticket_code_type else "uuid",
+        "ticket_code_type": ticket_code_type.value if ticket_code_type else "alphanumeric_8",
         "delivery_cost": float(delivery_cost.value) if delivery_cost else 0.0,
     }
 
@@ -154,7 +154,7 @@ def admin_branding_post(
     primary_color: str = Form(...),
     accent_color: str = Form(...),
     currency: str = Form("USD"),
-    ticket_code_type: str = Form("uuid"),
+    ticket_code_type: str = Form("alphanumeric_8"),
     delivery_cost: float = Form(0.0),
     db: Session = Depends(get_db),
     admin: str = Depends(get_admin_user)

@@ -130,7 +130,9 @@
             .ticket-box {
                 border: 2px dashed #000000;
                 background-color: #ffffff;
+                page-break-after: always;
                 page-break-inside: avoid;
+                margin-bottom: 50px;
             }
             .details h3, .details p {
                 color: #000000;
@@ -145,6 +147,7 @@
             }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -167,7 +170,8 @@
                     <p><strong>Tier:</strong> {{ tier.name }}</p>
                     <p><strong>Date:</strong> {{ event.date.strftime('%Y-%m-%d %H:%M') if hasattr(event.date, 'strftime') else event.date }}</p>
                     <p><strong>Location:</strong> {{ event.location }}</p>
-                    <span class="code">CODE: {{ ticket.ticket_code[:8]|upper }}...{{ ticket.ticket_code[-4:]|upper }}</span>
+                    <p><strong>Attendee:</strong> {{ booking.customer_name }}</p>
+                    <span class="code">CODE: {{ ticket.ticket_code|upper }}</span>
                 </div>
                 <div class="qr-code">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ ticket.ticket_code }}" alt="QR Check-in">
@@ -179,7 +183,30 @@
 
         <div class="actions">
             <button class="btn" onclick="window.print()">PRINT TICKETS</button>
+            <button class="btn" onclick="downloadPDF()" style="margin-left: 10px; background-color: #222; color: #fff; border: 1px solid var(--primary-color);">DOWNLOAD PDF</button>
         </div>
     </div>
+
+    <script>
+        function downloadPDF() {
+            var element = document.querySelector('.container');
+            // Hide actions during PDF generation
+            var actions = document.querySelector('.actions');
+            actions.style.display = 'none';
+            
+            var opt = {
+                margin:       10,
+                filename:     'tickets_' + '{{ booking.id }}' + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Re-show actions after save completes
+            html2pdf().set(opt).from(element).save().then(function() {
+                actions.style.display = 'block';
+            });
+        }
+    </script>
 </body>
 </html>

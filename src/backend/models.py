@@ -63,7 +63,10 @@ class BookingSession(Base):
     
     customer_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     customer_email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    customer_address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_street: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_street_number: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_city: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    customer_zip: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     delivery_method: Mapped[Optional[str]] = mapped_column(String, nullable=True) # "digital" or "physical"
     
     # relationships

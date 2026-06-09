@@ -14,16 +14,14 @@ def generate_unique_ticket_code(db: Session) -> str:
     setting = db.execute(
         select(SystemSetting).where(SystemSetting.key == "ticket_code_type")
     ).scalar_one_or_none()
-    code_type = setting.value if setting else "uuid"
+    code_type = setting.value if setting else "alphanumeric_8"
     
     attempts = 0
     while attempts < 100:
-        if code_type == "alphanumeric_8":
-            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
-        elif code_type == "numeric_6":
+        if code_type == "numeric_6":
             code = "".join(random.choices(string.digits, k=6))
-        else:
-            code = uuid.uuid4().hex
+        else: # default alphanumeric_8
+            code = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
             
         stmt = select(Ticket).where(Ticket.ticket_code == code)
         exists = db.execute(stmt).scalar()
@@ -31,7 +29,7 @@ def generate_unique_ticket_code(db: Session) -> str:
             return code
         attempts += 1
         
-    return uuid.uuid4().hex
+    return "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 from src.backend.schemas import (
     EventCreate,
@@ -130,7 +128,7 @@ def reserve_tickets(event_id: int, request: BookingReservationRequest, db: Sessi
                 detail="Sales for this ticket tier are paused"
             )
             
-        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        now = datetime.now()
         if tier.sales_start_at and now < tier.sales_start_at:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

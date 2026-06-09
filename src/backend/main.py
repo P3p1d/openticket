@@ -140,7 +140,10 @@ def process_checkout(
     session_id: str,
     customer_name: str = Form(...),
     customer_email: str = Form(...),
-    customer_address: str = Form(""),
+    customer_street: str = Form(""),
+    customer_street_number: str = Form(""),
+    customer_city: str = Form(""),
+    customer_zip: str = Form(""),
     delivery_method: str = Form("digital"),
     db: Session = Depends(get_db)
 ):
@@ -151,7 +154,10 @@ def process_checkout(
         
     booking.customer_name = customer_name
     booking.customer_email = customer_email
-    booking.customer_address = customer_address
+    booking.customer_street = customer_street
+    booking.customer_street_number = customer_street_number
+    booking.customer_city = customer_city
+    booking.customer_zip = customer_zip
     booking.delivery_method = delivery_method
     db.commit()
     
